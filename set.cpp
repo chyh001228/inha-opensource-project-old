@@ -42,20 +42,17 @@ class Set {
 
 
   // 트리의 루트 노드 반환
-  Node* GetRootOfTree() {
-    return root_;
-  }
-
+  Node *GetRootOfTree() { return root_; }
 
   // 트리에 노드가 없는 지 확인
   // input:
   // output: 노드가 있으면 true, 없으면 false
-  bool IsTreeEmpty();
+  bool IsTreeEmpty() { return size_ == 0 ? true : false; }
 
   // 트리에 들어 있는 노드 수 반환
   // input:
   // output: 트리에 있는 노드 수
-  int GetTreeSize();
+  int GetTreeSize() { return size_; }
 
   // 입력받은 숫자를 키로 가지는 노드 찾기
   // input: 찾을 노드의 Key
@@ -95,8 +92,14 @@ class Set {
 
   // 디버깅용 Inorder 출력
   // input: 서브트리의 Root
-  // ouput: 
-  void display(Node* node);
+  // ouput:
+  void display(Node *node) {
+    if (node == nullptr) return;
+
+    display(node->left_child);
+    cout << node->key << " ";
+    display(node->right_child);
+  };
 
 
  private:
@@ -107,12 +110,25 @@ class Set {
   // 노드의 Depth 반환
   // input: Depth를 알아낼 노드
   // output: 해당 노드의 Depth
-  int GetDepthOfNode(Node *node);
+  int GetDepthOfNode(Node *node) {
+    int depth = 0;
+    Node *temp = root_;
+    while (temp != nullptr && temp->key != node->key) {
+      temp = (node->key < temp->key) ? temp->left_child : temp->right_child;
+      depth += 1;
+    }
+    return depth;
+  }
 
   // 노드의 Height 반환
   // input: Height를 알아낼 노드
   // output: 해당 노드의 Height
-  int GetHeightOfNode(Node *node);
+  int GetHeightOfNode(Node *node) {
+    if (node == nullptr) {
+      return 0;
+    }
+    return node->height;
+  }
 
   // 노드의 Height 갱신
   // input: Height를 갱신할 노드
