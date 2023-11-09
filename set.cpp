@@ -47,7 +47,7 @@ class Set {
   // 트리에 노드가 없는 지 확인
   // input:
   // output: 노드가 있으면 true, 없으면 false
-  bool IsTreeEmpty() { return size_ == 0 ? true : false; }
+  bool IsTreeEmpty() { return (size_ == 0) ? true : false; }
 
   // 트리에 들어 있는 노드 수 반환
   // input:
