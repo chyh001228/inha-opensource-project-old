@@ -61,7 +61,8 @@ class Set {
 
 
   // 입력받은 숫자를 Key로 하는 노드를 트리에 삽입, 십압할 위치를 재귀적으로
-  // 찾음 input: 삽입할 노드의 Key
+  // 찾음
+  // input: 삽입할 노드의 Key
   // output: 삽입한 노드의 Depth
   int InsertNode(int key_to_insert) {
     Node *inserted_node = nullptr;
