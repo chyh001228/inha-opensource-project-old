@@ -47,7 +47,7 @@ class Set {
   // 트리에 노드가 없는 지 확인
   // input:
   // output: 노드가 있으면 true, 없으면 false
-  bool IsTreeEmpty() { return size_ == 0 ? true : false; }
+  bool IsTreeEmpty() { return (size_ == 0) ? true : false; }
 
   // 트리에 들어 있는 노드 수 반환
   // input:
@@ -60,10 +60,16 @@ class Set {
   int FindNode(int key_to_find);
 
 
-  // 입력받은 숫자를 Key로 하는 노드를 트리에 삽입, 십압할 위치를 재귀적으로 찾음
+  // 입력받은 숫자를 Key로 하는 노드를 트리에 삽입, 십압할 위치를 재귀적으로
+  // 찾음
   // input: 삽입할 노드의 Key
   // output: 삽입한 노드의 Depth
-  int InsertNode(int key_to_insert);
+  int InsertNode(int key_to_insert) {
+    Node *inserted_node = nullptr;
+    root_ = InsertNodeWithRecursion(root_, key_to_insert, inserted_node);
+    size_ += 1;
+    return GetDepthOfNode(inserted_node);
+  }
 
 
   // 입력받은 노드를 루트로 하는 서브트리에서 가장 작은 Key를 가지는 노드 찾기
@@ -85,8 +91,8 @@ class Set {
 
   // 트리에서 입력받은 Key보다 작은 노드의 수를 반환, 재귀적으로 탐색
   // 0인지 검사 후 +1 해야함
-  // input: 재귀적으로 현재 위치를 가지고 있을 노드 포인터, rank를 찾을 노드의
-  // Key output: 해당 노드의 rank, 노드가 없는 경우 0
+  // input: 재귀적으로 현재 위치를 가지고 있을 노드 포인터, rank를 찾을 노드의 Key
+  // output: 해당 노드의 rank, 노드가 없는 경우 0
   int GetRankOfKey(Node *node, int key_to_find_rank);
 
 
@@ -133,34 +139,111 @@ class Set {
   // 노드의 Height 갱신
   // input: Height를 갱신할 노드
   // output:
-  void UpdateHeightOfNode(Node *node);
+  void UpdateHeightOfNode(Node *node) {
+    if (node == nullptr) {
+      return;
+    }
+    node->height = 1 + max(GetHeightOfNode(node->left_child),
+                           GetHeightOfNode(node->right_child));
+  }
 
   // 입력 받은 노드를 기준으로 좌측으로 회전
   // input: 회전할 기준 노드
   // output: 회전 이후 서브트리의 루트 노드
-  Node* RotateLeft(Node *cur_root);
+  Node *RotateLeft(Node *cur_root) {
+    Node *next_root = cur_root->right_child;
+    Node *next_right_subtree = next_root->left_child;
+
+    next_root->left_child = cur_root;
+    cur_root->right_child = next_right_subtree;
+
+    UpdateHeightOfNode(cur_root);
+    UpdateHeightOfNode(next_root);
+
+    return next_root;
+  }
 
   // 입력 받은 노드를 기준으로 우측으로 회전
   // input: 회전할 기준 노드
   // output: 회전 이후 서브트리의 루트 노드
-  Node *RotateRight(Node *cur_root);
+  Node *RotateRight(Node *cur_root) {
+    Node *next_root = cur_root->left_child;
+    Node *next_left_subtree = next_root->right_child;
+
+    next_root->right_child = cur_root;
+    cur_root->left_child = next_left_subtree;
+
+    UpdateHeightOfNode(cur_root);
+    UpdateHeightOfNode(next_root);
+
+    return next_root;
+  }
 
 
   // BalanceFactor를 반환
   // input: BalanceFactor를 측정할 노드
   // output: BalanceFactor
-  int GetBalanceFactor(Node* node);
-  
+  int GetBalanceFactor(Node *node) {
+    if (node == nullptr) {
+      return 0;
+    }
+    return GetHeightOfNode(node->left_child) -
+           GetHeightOfNode(node->right_child);
+  }
+
 
   // AVL 트리의 특성을 유지하기 위해서 다시 밸런싱
   // input: 리밸런싱할 서브트리의 루트 노드
   // output: 리밸런싱 이후 서브트리의 루트 노드
-  Node *RebalanceTree(Node *node);
+  Node *RebalanceTree(Node *node) {
+    UpdateHeightOfNode(node);
+
+    int balance_factor = GetBalanceFactor(node);
+
+    if (balance_factor > 1) {
+      if (GetBalanceFactor(node->left_child) < 0) {
+        node->left_child = RotateLeft(node->left_child);
+      }
+      return RotateRight(node);
+    }
+    if (balance_factor < -1) {
+      if (GetBalanceFactor(node->right_child) > 0) {
+        node->right_child = RotateRight(node->right_child);
+      }
+      return RotateLeft(node);
+    }
+
+    return node;
+  }
+
 
   // 입력받은 숫자를 Key로 하는 노드를 트리에 삽입, 재귀적으로 삽입할 위치 찾기
   // input: 현재 삽입 위치 포인터, 삽입할 삽입할 노드의 Key, 삽입할 위치의 Depth
   // output: 재귀를 돌면서 변화된 서브트리의 루트
-  Node *InsertNodeWithRecursion(Node *node, int key_to_insert, Node*& inserted_node);
+  Node *InsertNodeWithRecursion(Node *node, int key_to_insert,
+                                Node *&inserted_node) {
+    // 받은 노드가 nullptr이면 그 자리에 삽입
+    if (node == nullptr) {
+      // 새로운 노드 생성, 해당 위치에 그대로 삽입
+      inserted_node = new Node(key_to_insert);
+      return inserted_node;
+    }
+    // 재귀적으로 삽입할 위치 탐색
+    else if (node->key < key_to_insert) {
+      node->right_child = InsertNodeWithRecursion(node->right_child,
+                                                  key_to_insert, inserted_node);
+    } else if (node->key > key_to_insert) {
+      node->left_child = InsertNodeWithRecursion(node->left_child,
+                                                 key_to_insert, inserted_node);
+    }
+    // 이미 동일한 키값을 가진 노드가 존재
+    else {
+      return node;
+    }
+
+    // 트리 리밸런싱 이후 서브트리의 루트 반환
+    return RebalanceTree(node);
+  }
 
 
   // 입력받은 숫자를 Key로 하는 노드를 트리에서 삭제, 재귀적으로 삭제 위치 찾기
