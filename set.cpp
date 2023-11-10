@@ -132,9 +132,23 @@ class Set {
 
   // 트리에서 입력받은 Key보다 작은 노드의 수를 반환, 재귀적으로 탐색
   // 0인지 검사 후 +1 해야함
-  // input: 재귀적으로 현재 위치를 가지고 있을 노드 포인터, rank를 찾을 노드의 Key
-  // output: 해당 노드의 rank, 노드가 없는 경우 0
-  int GetRankOfKey(Node *node, int key_to_find_rank);
+  // input: 재귀적으로 현재 위치를 가지고 있을 노드 포인터, rank를 찾을 노드의
+  // Key output: 해당 노드의 rank, 노드가 없는 경우 0
+  int GetRankOfKey(Node *node, int key_to_find_rank) {
+    if (node == nullptr) {
+      return 0;
+    }
+
+    // 현재 노드의 키가 더 큰 경우 그대로 왼쪽 자식 탐색
+    if (key_to_find_rank <= node->key) {
+      return GetRankOfKey(node->left_child, key_to_find_rank);
+    }
+    // 현재 노드의 키가 작은 경우 양쪽 자식 탐색
+    else {
+      return 1 + GetRankOfKey(node->left_child, key_to_find_rank) +
+             GetRankOfKey(node->right_child, key_to_find_rank);
+    }
+  }
 
 
   // 디버깅용 Inorder 출력
