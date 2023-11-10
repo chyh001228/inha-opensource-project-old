@@ -89,7 +89,7 @@ class Set {
   // 입력받은 노드를 루트로 하는 서브트리에서 가장 작은 Key를 가지는 노드 찾기
   // input: 서브트리의 루트 노드
   // output: 서브트리에서 가장 작은 Key, 서브트리에서 해당 노드의 Depth
-  int[] GetMinimumNodeOfSubTree(Node *node) {
+  int[] GetMinimumKeyAndDepthFromSubTree(Node *node) {
     int depth = 0;
     while (node->left_child != nullptr) {
       node = node->left_child;
@@ -106,7 +106,7 @@ class Set {
   // 받은 키를 루트로 하는 서브트리에서 가장 큰 Key를 가지는 노드 찾기
   // input: 서브트리의 루트 노드
   // output: 서브트리에서 가장 큰 Key, 서브트리에서 해당 노드의 Depth
-  int[] GetMaximumNodeOfSubTree(Node *node) {
+  int[] GetMaximumKeyAndDepthFromSubTree(Node *node) {
     int depth = 0;
     while (node->right_child != nullptr) {
       node = node->right_child;
@@ -119,10 +119,15 @@ class Set {
   }
 
 
-  // 입력받은 숫자를 Key로 하는 노드를 트리에서 삭제, 삭제할 위치를 재귀적으로 찾음
+  // 입력받은 숫자를 Key로 하는 노드를 트리에서 삭제, 삭제할 위치를 재귀적으로
+  // 찾음
   // input: 삭제할 노드의 Key
   // output: 삭제한 노드의 Depth
-  int DeleteNode(int key_to_insert);
+  int DeleteNode(int key_to_insert) {
+    int depth = 0;
+    root_ = DeleteNodeWithRecursion(root_, key_to_insert, depth);
+    return depth;
+  }
 
 
   // 트리에서 입력받은 Key보다 작은 노드의 수를 반환, 재귀적으로 탐색
@@ -282,8 +287,73 @@ class Set {
   }
 
 
+  // 받은 키를 루트로 하는 서브트리에서 가장 작은 Key를 가지는 노드 찾기
+  // input: 서브트리의 루트 노드
+  // output: 서브트리에서 가장 작은 Key를 가진 노드
+  Node *GetMinimumNodeFromSubTree(Node *node) {
+    while (node->left_child != nullptr) {
+      node = node->left_child;
+    }
+    return node;
+  }
+
+
   // 입력받은 숫자를 Key로 하는 노드를 트리에서 삭제, 재귀적으로 삭제 위치 찾기
   // input: 현재 삭제 위치 포인터, 삭제할 노드의 Key
   // output: 재귀를 돌면서 변화된 서브트리의 루트
-  Node* DeleteNodeWithRecursion(Node *node, int key_to_delete, int& depth);
+  Node *DeleteNodeWithRecursion(Node *node, int key_to_delete, int &depth) {
+    // 삭제할 것이 없으면 그대로 nullptr 반환
+    if (node == nullptr) {
+      return node;
+    }
+
+    // 재귀적으로 삭제할 노드 찾기
+    if (key_to_delete < node->key) {
+      node->left_child =
+          DeleteNodeWithRecursion(node->left_child, key_to_delete, depth);
+      depth += 1;
+    } else if (key_to_delete > node->key) {
+      node->right_child =
+          DeleteNodeWithRecursion(node->right_child, key_to_delete, depth);
+      depth += 1;
+    }
+    // 삭제할 노드 찾은 경우
+    else {
+      // 자식이 하나이거나 없는 경우
+      if (node->left_child == nullptr || node->right_child == nullptr) {
+        // temp = 삭제할 노드의 자식 노드
+        Node *temp = (node->left_child) ? node->left_child : node->right_child;
+
+        // 자식이 없는 경우
+        if (temp == nullptr) {
+          temp = node;
+          node = nullptr;
+        }
+        // 자식이 하나인 경우
+        else {
+          // 삭제할 노드 위치에 자식 노드를 붙임
+          *node = *temp;
+        }
+        delete temp;
+        size_ -= 1;
+      }
+      // 자식이 둘인 경우
+      else {
+        // 후계자 노드 찾기
+        Node *temp = GetMinimumNodeFromSubTree(node->right_child);
+        node->key = temp->key;
+        node->right_child =
+            DeleteNodeWithRecursion(node->right_child, temp->key, depth);
+      }
+    }
+
+    // 자식이 없었던 경우 그대로 리턴
+    if (node == nullptr) {
+      return node;
+    }
+
+    // 자식이 있었다면 Height 갱신, 리밸런싱
+    UpdateHeightOfNode(node);
+    return RebalanceTree(node);
+  }
 };
