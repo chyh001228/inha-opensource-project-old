@@ -32,7 +32,8 @@ struct Node {
   Node *right_child;
   int height;
 
-  Node(int val) : key(val), left_child(nullptr), right_child(nullptr), height(1) {}
+  Node(int val) 
+      : key(val), left_child(nullptr), right_child(nullptr), height(1) {}
 };
 
 class Set {
