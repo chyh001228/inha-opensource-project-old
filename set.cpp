@@ -57,7 +57,21 @@ class Set {
   // 입력받은 숫자를 키로 가지는 노드 찾기
   // input: 찾을 노드의 Key
   // output: 해당 숫자를 Key로 하는 노드의 Depth, 없으면 0
-  int FindNode(int key_to_find);
+  int FindNode(int key_to_find) {
+    Node *temp = root_;
+    int depth = 0;
+    // temp가 nullptr이 아니고 키 값이 다른 경우 계속 탐색
+    // AVL Tree는 정렬되어 있기 때문에 Key 비교 후 이동할 자식 결정
+    while (temp != nullptr) {
+      if (temp->key == key_to_find) {
+        return depth;
+      } else {
+        temp = (key_to_find < temp->key) ? temp->left_child : temp->right_child;
+        depth += 1;
+      }
+    }
+    return 0;
+  }
 
 
   // 입력받은 숫자를 Key로 하는 노드를 트리에 삽입, 십압할 위치를 재귀적으로
@@ -74,13 +88,35 @@ class Set {
 
   // 입력받은 노드를 루트로 하는 서브트리에서 가장 작은 Key를 가지는 노드 찾기
   // input: 서브트리의 루트 노드
-  // output: 서브트리에서 가장 작은 Key를 가진 노드
-  Node *GetMinimumNodeOfSubTree(Node *node);
+  // output: 서브트리에서 가장 작은 Key, 서브트리에서 해당 노드의 Depth
+  int[] GetMinimumNodeOfSubTree(Node *node) {
+    int depth = 0;
+    while (node->left_child != nullptr) {
+      node = node->left_child;
+      depth += 1;
+    }
+    // 문제에서는 찾지 못하는 경우가 없다고 제한
+    // 좀 더 일반적인 환경에서 사용할 수 있도록 분기 구현
+    if (node == nullptr) {
+      return [-1, -1];
+    }
+    return [node->key, depth];
+  }
 
   // 받은 키를 루트로 하는 서브트리에서 가장 큰 Key를 가지는 노드 찾기
   // input: 서브트리의 루트 노드
-  // output: 서브트리에서 가장 큰 Key를 가진 노드
-  Node *GetMaximumNodeOfSubTree(Node *node);
+  // output: 서브트리에서 가장 큰 Key, 서브트리에서 해당 노드의 Depth
+  int[] GetMaximumNodeOfSubTree(Node *node) {
+    int depth = 0;
+    while (node->right_child != nullptr) {
+      node = node->right_child;
+      depth += 1;
+    }
+    if (node == nullptr) {
+      return [-1, -1];
+    }
+    return [node->key, depth];
+  }
 
 
   // 입력받은 숫자를 Key로 하는 노드를 트리에서 삭제, 삭제할 위치를 재귀적으로 찾음
