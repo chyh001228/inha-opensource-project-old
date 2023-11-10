@@ -134,7 +134,14 @@ class Set {
   // 0인지 검사 후 +1 해야함
   // input: 재귀적으로 현재 위치를 가지고 있을 노드 포인터, rank를 찾을 노드의 Key
   // output: 해당 노드의 rank, 노드가 없는 경우 0
-  int GetRankOfKey(Node *node, int key_to_find_rank);
+  int GetRank(int key_, Node* input_, int number_of_smaller) {
+    int temp_number = number_of_smaller;
+    if (input_ == nullptr) return temp_number;
+    
+    if (key_ > input_.key) temp_number +=1;
+    temp_number = GetRank(key_, input_->left_child, temp_number);
+    temp_number = GetRank(key_, input_->right_child, temp_number);
+  }
 
 
   // 디버깅용 Inorder 출력
