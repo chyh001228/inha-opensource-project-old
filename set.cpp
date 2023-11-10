@@ -86,36 +86,39 @@ class Set {
   }
 
 
-  // 입력받은 노드를 루트로 하는 서브트리에서 가장 작은 Key를 가지는 노드 찾기
-  // input: 서브트리의 루트 노드
-  // output: 서브트리에서 가장 작은 Key, 서브트리에서 해당 노드의 Depth
-  int[] GetMinimumKeyAndDepthFromSubTree(Node *node) {
-    int depth = 0;
-    while (node->left_child != nullptr) {
-      node = node->left_child;
-      depth += 1;
+  //int 유형을 중첩하여 Node 유형을 변환하는 방법입니다.
+  //Input: 찾을 노드의 Key
+  //Output: 결과는 cout을 통해 출력 가능하며 반환값은 없습니다.
+  void GetMaximumNodeOfSubTree(int key_to_insert) {
+    Node* temp = GetInputNode(key_to_insert);
+    
+    //제목에는 없지만, 그가 Node의 존재 여부를 판단할 수 있는 방법이 있어야 한다고 생각합니다.
+    if (temp == nullptr) {
+        cout << "Node not found." << endl;
+        return;
     }
-    // 문제에서는 찾지 못하는 경우가 없다고 제한
-    // 좀 더 일반적인 환경에서 사용할 수 있도록 분기 구현
-    if (node == nullptr) {
-      return [-1, -1];
+
+    while (temp->right_child != nullptr) {
+        temp = temp->right_child;
     }
-    return [node->key, depth];
+    cout << temp.key << " " << GetDepthOfNode(temp) << endl;
+
   }
 
-  // 받은 키를 루트로 하는 서브트리에서 가장 큰 Key를 가지는 노드 찾기
-  // input: 서브트리의 루트 노드
-  // output: 서브트리에서 가장 큰 Key, 서브트리에서 해당 노드의 Depth
-  int[] GetMaximumKeyAndDepthFromSubTree(Node *node) {
-    int depth = 0;
-    while (node->right_child != nullptr) {
-      node = node->right_child;
-      depth += 1;
+  void GetMinimumNodeOfSubTree(int key_to_insert) {
+    Node* temp = GetInputNode(key_to_insert);
+
+    //위와 같다.
+    if (temp == nullptr) {
+        cout << "Node not found." << endl;
+        return;
     }
-    if (node == nullptr) {
-      return [-1, -1];
+
+    while (temp->left_child != nullptr) {
+        temp = temp->left_child;
     }
-    return [node->key, depth];
+    cout << temp.key << " " << GetDepthOfNode(temp) << endl;
+
   }
 
 
@@ -152,6 +155,23 @@ class Set {
  private:
   Node *root_;
   int size_;
+
+  //Node를 찾는 방법을 새로 정의합니다.
+  //Input: 찾을 노드의 Key
+  //Output: 찾을 노드
+  Node* GetInputNode(int key_to_insert) {
+    Node* temp = root_;
+    int depth = 0;
+    while (temp != nullptr) {
+        if (temp->key == key_to_find) {
+            return temp;
+        }
+        else {
+            temp = (key_to_find < temp->key) ? temp->left_child : temp->right_child;
+        }
+    }
+    return nullptr;
+  }
 
 
   // 노드의 Depth 반환
