@@ -6,7 +6,7 @@ TEST(SetTest, Constructor) {
     Set mySet; 
 
     //root가 nullptr인지 확인
-    EXPECT_EQ(mySet.GetRootOfTree(), nullptr);
+    ASSERT_EQ(mySet.GetRootOfTree(), nullptr);
 }
 
 // 메인 함수
