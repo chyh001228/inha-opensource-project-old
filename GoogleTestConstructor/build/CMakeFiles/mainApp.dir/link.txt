@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/mainApp.dir/main.cc.o -o mainApp  libcommon_library.a 
